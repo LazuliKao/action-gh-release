@@ -95,7 +95,9 @@ export const parseInputFiles = (files: string): string[] => {
 
 export const parseConfig = (env: Env): Config => {
   return {
-    github_token: env.GITHUB_TOKEN || env.INPUT_TOKEN || '',
+    // Prioritize INPUT_TOKEN (user-provided token) over GITHUB_TOKEN (default)
+    // This is important for cross-repository operations
+    github_token: env.INPUT_TOKEN || env.GITHUB_TOKEN || '',
     github_ref: env.GITHUB_REF || '',
     github_repository: env.INPUT_REPOSITORY || env.GITHUB_REPOSITORY || '',
     github_api_url: env.INPUT_GITHUB_API_URL || env.GITHUB_API_URL || 'https://api.github.com',
