@@ -6,6 +6,8 @@ export interface Config {
   github_token: string;
   github_ref: string;
   github_repository: string;
+  github_api_url: string;
+  github_uploads_url: string;
   // user provided
   input_name?: string;
   input_tag_name?: string;
@@ -26,12 +28,19 @@ export interface Config {
   input_make_latest: 'true' | 'false' | 'legacy' | undefined;
 }
 
-export const uploadUrl = (url: string): string => {
-  const templateMarkerPos = url.indexOf('{');
+export const uploadUrl = (url: string, customUploadsUrl?: string): string => {
+  let resultUrl = url;
+  const templateMarkerPos = resultUrl.indexOf('{');
   if (templateMarkerPos > -1) {
-    return url.substring(0, templateMarkerPos);
+    resultUrl = resultUrl.substring(0, templateMarkerPos);
   }
-  return url;
+  
+  // Replace default uploads URL with custom one if provided
+  if (customUploadsUrl && customUploadsUrl !== 'https://uploads.github.com') {
+    resultUrl = resultUrl.replace('https://uploads.github.com', customUploadsUrl);
+  }
+  
+  return resultUrl;
 };
 
 export const releaseBody = (config: Config): string | undefined => {
@@ -89,6 +98,8 @@ export const parseConfig = (env: Env): Config => {
     github_token: env.GITHUB_TOKEN || env.INPUT_TOKEN || '',
     github_ref: env.GITHUB_REF || '',
     github_repository: env.INPUT_REPOSITORY || env.GITHUB_REPOSITORY || '',
+    github_api_url: env.INPUT_GITHUB_API_URL || env.GITHUB_API_URL || 'https://api.github.com',
+    github_uploads_url: env.INPUT_GITHUB_UPLOADS_URL || env.GITHUB_UPLOADS_URL || 'https://uploads.github.com',
     input_name: env.INPUT_NAME,
     input_tag_name: env.INPUT_TAG_NAME?.trim(),
     input_body: env.INPUT_BODY,

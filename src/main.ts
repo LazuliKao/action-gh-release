@@ -32,6 +32,7 @@ async function run() {
 
     const gh = getOctokit(config.github_token, {
       //new oktokit(
+      baseUrl: config.github_api_url,
       throttle: {
         onRateLimit: (retryAfter, options) => {
           console.warn(`Request quota exhausted for request ${options.method} ${options.url}`);
@@ -62,7 +63,7 @@ async function run() {
       const currentAssets = rel.assets;
 
       const uploadFile = async (path) => {
-        const json = await upload(config, gh, uploadUrl(rel.upload_url), path, currentAssets);
+        const json = await upload(config, gh, uploadUrl(rel.upload_url, config.github_uploads_url), path, currentAssets);
         if (json) {
           delete json.uploader;
         }
